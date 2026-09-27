@@ -1,0 +1,693 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Survey Link Generator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #121212;
+        color: #f0f0f0;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #1e1e1e;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #ffcc00;
+    }
+    .file-section {
+        text-align: center;
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px dashed #444;
+        border-radius: 8px;
+        background-color: #222;
+    }
+    input[type="file"] {
+        margin-top: 10px;
+    }
+    .button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+    .btn-primary { background-color: #007bff; color: white; }
+    .btn-primary:hover { background-color: #0056b3; }
+    .btn-success { background-color: #28a745; color: white; }
+    .btn-success:hover { background-color: #218838; }
+    .btn-warning { background-color: #ffc107; color: #212529; }
+    .btn-warning:hover { background-color: #e0a800; }
+    .btn:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.6; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #333;
+        padding: 8px;
+        text-align: left;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #ff6600;
+        color: white;
+        position: sticky;
+        top: 0;
+    }
+    tr:nth-child(even) { background-color: #1a1a1a; }
+    .copy-btn {
+        background-color: #17a2b8;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+    }
+    .copy-btn:hover { background-color: #138496; }
+    .copy-btn.copied {
+        background-color: red !important;
+        cursor: not-allowed;
+    }
+    /* Hide Survey Model and Generated Link columns visually */
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(4), td:nth-child(4) {
+        display: none;
+    }
+    .status {
+        text-align: center;
+        margin: 20px 0;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .status.success { background-color: #155724; color: #d4edda; border: 1px solid #28a745; }
+    .status.error { background-color: #721c24; color: #f8d7da; border: 1px solid #dc3545; }
+    .table-container {
+        max-height: 600px;
+        overflow-y: auto;
+        border: 1px solid #333;
+        border-radius: 5px;
+    }
+
+    /* 🔥 EPIC ACTION ANIMATIONS */
+    
+    /* Screen shake effect */
+    .screen-shake {
+        animation: screenShake 0.5s ease-in-out;
+    }
+    @keyframes screenShake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px) rotate(0.5deg); }
+        20%, 40%, 60%, 80% { transform: translateX(5px) rotate(-0.5deg); }
+    }
+    
+    /* Explosive row entry */
+    .animate-row {
+        animation: explosiveEntry 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        opacity: 0;
+        transform: translateX(200px) rotateY(-90deg) scale(0.3);
+    }
+    @keyframes explosiveEntry {
+        0% {
+            opacity: 0;
+            transform: translateX(200px) rotateY(-90deg) scale(0.3);
+        }
+        60% {
+            opacity: 1;
+            transform: translateX(-10px) rotateY(10deg) scale(1.1);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0) rotateY(0deg) scale(1);
+        }
+    }
+
+    /* Nuclear explosion effect */
+    .nuclear-explosion {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(
+            circle,
+            rgba(255, 255, 0, 1) 0%,
+            rgba(255, 165, 0, 0.9) 20%,
+            rgba(255, 69, 0, 0.7) 40%,
+            rgba(255, 0, 0, 0.5) 60%,
+            rgba(0, 0, 0, 0) 100%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+        animation: nuclearBlast 0.8s ease-out forwards;
+        z-index: 1000;
+    }
+    @keyframes nuclearBlast {
+        0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 1;
+            filter: blur(0px);
+        }
+        50% {
+            transform: scale(2) rotate(180deg);
+            opacity: 0.8;
+            filter: blur(2px);
+        }
+        100% {
+            transform: scale(4) rotate(360deg);
+            opacity: 0;
+            filter: blur(10px);
+        }
+    }
+
+    /* Lightning effect */
+    .lightning-strike {
+        position: absolute;
+        width: 3px;
+        height: 100px;
+        background: linear-gradient(to bottom, 
+            rgba(255, 255, 255, 1) 0%,
+            rgba(0, 191, 255, 0.8) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        pointer-events: none;
+        animation: lightningFlash 0.3s ease-in-out;
+        z-index: 999;
+    }
+    @keyframes lightningFlash {
+        0%, 100% { opacity: 0; transform: scaleY(0); }
+        10%, 90% { opacity: 1; transform: scaleY(1) translateY(-50px); }
+        50% { opacity: 1; transform: scaleY(1.5) translateY(-75px); }
+    }
+
+    /* Particle burst */
+    .particle-burst {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: particleExplode 1s ease-out forwards;
+    }
+    .particle-burst.fire { background: linear-gradient(45deg, #ff6b35, #f7931e); }
+    .particle-burst.electric { background: linear-gradient(45deg, #00d4ff, #ffffff); box-shadow: 0 0 10px #00d4ff; }
+    .particle-burst.magic { background: linear-gradient(45deg, #ff00ff, #8000ff); box-shadow: 0 0 8px #ff00ff; }
+    
+    @keyframes particleExplode {
+        0% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.2) rotate(720deg);
+        }
+    }
+
+    /* Shockwave effect */
+    .shockwave {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0, 191, 255, 0.8);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: shockwaveExpand 0.6s ease-out forwards;
+    }
+    @keyframes shockwaveExpand {
+        0% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(15);
+            opacity: 0;
+        }
+    }
+
+    /* Matrix rain effect */
+    .matrix-rain {
+        position: absolute;
+        color: #00ff41;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        pointer-events: none;
+        animation: matrixFall 2s linear forwards;
+        text-shadow: 0 0 5px #00ff41;
+    }
+    @keyframes matrixFall {
+        0% {
+            opacity: 1;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(100px);
+        }
+    }
+
+    /* Button transformation */
+    .copy-btn {
+        background-color: #17a2b8;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .copy-btn:hover { 
+        background-color: #138496; 
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(23, 162, 184, 0.5);
+    }
+    
+    .copy-btn.copied {
+        background-color: #ff4757 !important;
+        cursor: not-allowed;
+        animation: buttonDestroy 0.8s ease-out forwards;
+    }
+    
+    @keyframes buttonDestroy {
+        0% { transform: scale(1) rotate(0deg); }
+        25% { transform: scale(1.2) rotate(-5deg); }
+        50% { transform: scale(0.9) rotate(5deg); }
+        75% { transform: scale(1.1) rotate(-3deg); }
+        100% { transform: scale(1) rotate(0deg); filter: grayscale(0.5); }
+    }
+
+    /* Holographic scan line */
+    .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(0, 255, 255, 0.8) 50%, 
+            transparent 100%
+        );
+        pointer-events: none;
+        animation: scanMove 0.5s ease-in-out;
+        z-index: 998;
+    }
+    @keyframes scanMove {
+        0% { transform: translateY(-50px); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateY(50px); opacity: 0; }
+    }
+
+    /* Energy sphere */
+    .energy-sphere {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle, 
+            rgba(0, 255, 255, 1) 0%,
+            rgba(0, 255, 255, 0.5) 50%,
+            rgba(0, 255, 255, 0) 100%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+        animation: energyPulse 0.4s ease-out forwards;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    }
+    @keyframes energyPulse {
+        0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(3) rotate(360deg);
+            opacity: 0;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Survey Link Generator</h1>
+    <div class="file-section">
+        <h3>Upload Excel File</h3>
+        <input type="file" id="fileInput" accept=".xlsx, .xls">
+        <div class="button-group">
+            <button class="btn btn-primary" id="generateBtn" onclick="processFile()" disabled>Generate Links</button>
+            <button class="btn btn-warning" onclick="clearData()">Clear All</button>
+        </div>
+    </div>
+    <div id="status" class="status" style="display: none;"></div>
+    <div class="button-group">
+        <button class="btn btn-success" id="copyAllBtn" onclick="copyAllLinks()" disabled>Copy All Links</button>
+        <button class="btn btn-primary" onclick="exportToCSV()" id="exportBtn" disabled>Export to CSV</button>
+    </div>
+    <div class="table-container">
+        <table id="linkTable">
+            <thead>
+                <tr>
+                    <th>Receipt No.</th>
+                    <th>Sales Type</th>
+                    <th>Survey Model</th>
+                    <th>Generated Link</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+let currentData = [];
+const storeID = "91KDIPL661-01"; // Store Code
+
+// Excel date/time converters
+function convertExcelDate(serial) {
+    const date = new Date((serial - 25569) * 86400 * 1000);
+    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+function convertExcelTime(serial) {
+    const totalMilliseconds = Math.round(serial * 24 * 60 * 60 * 1000);
+    const hours = String(Math.floor(totalMilliseconds / (60 * 60 * 1000))).padStart(2,'0');
+    const minutes = String(Math.floor((totalMilliseconds % (60 * 60 * 1000)) / (60 * 1000))).padStart(2,'0');
+    const seconds = String(Math.floor((totalMilliseconds % (60 * 1000)) / 1000)).padStart(2,'0');
+    const milliseconds = String(totalMilliseconds % 1000).padStart(3,'0');
+    return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+}
+
+// Generate link
+function generateSurveyLink(row) {
+    const receiptNo = row['Receipt No.'];
+    const salesType = row['Sales Type'];
+    let surveyModel = '', orderID = '', numericOT = '';
+
+    if (/^\d+$/.test(receiptNo) && salesType === 'TAKEAWAY') { surveyModel = '6.0'; orderID = receiptNo; numericOT = '2'; }
+    else if (/^\d+$/.test(receiptNo) && salesType === 'DINE-IN') { surveyModel = '6.0'; orderID = receiptNo; numericOT = '1'; }
+    else if (receiptNo.startsWith('K371') && salesType === 'TAKEAWAY') { surveyModel = '4.0'; orderID = receiptNo.slice(-4); numericOT = '2'; }
+    else if (receiptNo.startsWith('K371') && salesType === 'DINE-IN') { surveyModel = '4.0'; orderID = receiptNo.slice(-4); numericOT = '1'; }
+    else if (receiptNo.startsWith('K371') && salesType === 'DELIVERY') { surveyModel = '3.0'; orderID = receiptNo; numericOT = '3'; }
+    else { return null; }
+
+    const date = convertExcelDate(row['Date']);
+    const time = convertExcelTime(row['Time']);
+    const phoneNumber = `91${row['Sell-to Contact No.']}`;
+    const isoDateTime = `${date}T${time}Z`;
+
+    const data = { "S": storeID, "OI": orderID, "D": date, "TM": time, "DTM": isoDateTime, "TI": orderID, "OT": numericOT, "SM": surveyModel, "PH": phoneNumber };
+    const encodedData = btoa(JSON.stringify(data));
+    return `https://customer.kfc-listens.com/jfe/form/SV_8bHC0noyvM3jPWC?Q_EED=${encodedData}`;
+}
+
+// 🔥 EPIC ACTION EFFECTS
+
+// Nuclear explosion effect
+function createNuclearExplosion(button, event) {
+    const explosion = document.createElement('div');
+    explosion.className = 'nuclear-explosion';
+    const rect = button.getBoundingClientRect();
+    explosion.style.left = (event.clientX - rect.left - 75) + 'px';
+    explosion.style.top = (event.clientY - rect.top - 75) + 'px';
+    button.appendChild(explosion);
+    
+    // Screen shake
+    document.body.classList.add('screen-shake');
+    setTimeout(() => document.body.classList.remove('screen-shake'), 500);
+    
+    setTimeout(() => explosion.remove(), 800);
+}
+
+// Lightning strike effect
+function createLightningStrike(button) {
+    for (let i = 0; i < 5; i++) {
+        const lightning = document.createElement('div');
+        lightning.className = 'lightning-strike';
+        lightning.style.left = Math.random() * button.offsetWidth + 'px';
+        lightning.style.top = '-50px';
+        lightning.style.animationDelay = i * 0.1 + 's';
+        button.appendChild(lightning);
+        
+        setTimeout(() => lightning.remove(), 300);
+    }
+}
+
+// Particle burst explosion
+function createParticleBurst(button, event) {
+    const particleTypes = ['fire', 'electric', 'magic'];
+    const rect = button.getBoundingClientRect();
+    
+    for (let i = 0; i < 25; i++) {
+        const particle = document.createElement('div');
+        particle.className = `particle-burst ${particleTypes[Math.floor(Math.random() * particleTypes.length)]}`;
+        
+        const angle = (Math.PI * 2 * i) / 25;
+        const velocity = Math.random() * 100 + 50;
+        const startX = event.clientX - rect.left;
+        const startY = event.clientY - rect.top;
+        
+        particle.style.left = startX + 'px';
+        particle.style.top = startY + 'px';
+        particle.style.setProperty('--end-x', Math.cos(angle) * velocity + 'px');
+        particle.style.setProperty('--end-y', Math.sin(angle) * velocity + 'px');
+        
+        // Custom animation for each particle
+        particle.style.animation = `particleExplode 1s ease-out forwards`;
+        particle.style.transform = `translate(${Math.cos(angle) * velocity}px, ${Math.sin(angle) * velocity}px)`;
+        
+        button.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+    }
+}
+
+// Shockwave effect
+function createShockwave(button, event) {
+    for (let i = 0; i < 3; i++) {
+        const shockwave = document.createElement('div');
+        shockwave.className = 'shockwave';
+        const rect = button.getBoundingClientRect();
+        shockwave.style.left = (event.clientX - rect.left - 10) + 'px';
+        shockwave.style.top = (event.clientY - rect.top - 10) + 'px';
+        shockwave.style.animationDelay = i * 0.2 + 's';
+        button.appendChild(shockwave);
+        
+        setTimeout(() => shockwave.remove(), 600);
+    }
+}
+
+// Matrix rain effect
+function createMatrixRain(button) {
+    const matrixChars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    
+    for (let i = 0; i < 15; i++) {
+        const char = document.createElement('div');
+        char.className = 'matrix-rain';
+        char.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+        char.style.left = Math.random() * button.offsetWidth + 'px';
+        char.style.top = '-20px';
+        char.style.animationDelay = Math.random() * 0.5 + 's';
+        button.appendChild(char);
+        
+        setTimeout(() => char.remove(), 2000);
+    }
+}
+
+// Holographic scan effect
+function createHolographicScan(button) {
+    const scanLine = document.createElement('div');
+    scanLine.className = 'scan-line';
+    scanLine.style.left = '0';
+    scanLine.style.top = '0';
+    button.appendChild(scanLine);
+    
+    setTimeout(() => scanLine.remove(), 500);
+}
+
+// Energy sphere effect
+function createEnergySphere(button, event) {
+    const sphere = document.createElement('div');
+    sphere.className = 'energy-sphere';
+    const rect = button.getBoundingClientRect();
+    sphere.style.left = (event.clientX - rect.left - 20) + 'px';
+    sphere.style.top = (event.clientY - rect.top - 20) + 'px';
+    button.appendChild(sphere);
+    
+    setTimeout(() => sphere.remove(), 400);
+}
+
+// File processing
+function processFile() {
+    const file = document.getElementById('fileInput').files[0];
+    if (!file) return showStatus('Please select a file first', 'error');
+    showStatus('Processing file...', 'success');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+            const filteredData = sheetData.filter(row => !(row['POS Receipt No.']||'').match(/K371SWG|K371ZMT|K371MAGIC/));
+
+            currentData = [];
+            const tbody = document.querySelector('#linkTable tbody');
+            tbody.innerHTML = '';
+
+            let processedCount = 0;
+            filteredData.forEach((row, index) => {
+                const link = generateSurveyLink(row);
+                if (link) {
+                    processedCount++;
+                    const linkData = {
+                        receiptNo: row['Receipt No.'],
+                        salesType: row['Sales Type'],
+                        surveyModel: link.includes('SM=6.0') ? '6.0' : link.includes('SM=4.0') ? '4.0' : link.includes('SM=3.0') ? '3.0' : 'Unknown',
+                        link: link
+                    };
+                    currentData.push(linkData);
+
+                    const tr = document.createElement('tr');
+                    tr.classList.add('animate-row');
+                    tr.style.animationDelay = `${index * 0.1}s`;
+                    tr.innerHTML = `
+                        <td>${linkData.receiptNo}</td>
+                        <td>${linkData.salesType}</td>
+                        <td>${linkData.surveyModel}</td>
+                        <td>${linkData.link}</td>
+                        <td><button class="copy-btn" onclick="copyIndividualLink('${link}', this, event)">Copy</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+
+            showStatus(`Processed ${processedCount} records`, 'success');
+            document.getElementById('copyAllBtn').disabled = false;
+            document.getElementById('exportBtn').disabled = false;
+        } catch (err) {
+            showStatus('Error: ' + err.message, 'error');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// 🔥 MEGA EPIC ENHANCED copy link function with INSANE EFFECTS
+function copyIndividualLink(link, btn, event) {
+    // 💥 STAGE 1: Initial Impact Effects
+    createNuclearExplosion(btn, event);
+    createShockwave(btn, event);
+    createEnergySphere(btn, event);
+    
+    // ⚡ STAGE 2: Lightning and Energy
+    setTimeout(() => {
+        createLightningStrike(btn);
+        createHolographicScan(btn);
+    }, 100);
+    
+    // 🎆 STAGE 3: Particle Explosion
+    setTimeout(() => {
+        createParticleBurst(btn, event);
+    }, 200);
+    
+    navigator.clipboard.writeText(link).then(() => {
+        btn.textContent = 'DESTROYED!';
+        btn.classList.add('copied');
+        btn.disabled = true;
+        
+        // 🎬 STAGE 4: Final Matrix Effect
+        setTimeout(() => {
+            createMatrixRain(btn);
+            btn.textContent = '☠️ COPIED ☠️';
+        }, 300);
+        
+        // 🔥 STAGE 5: Victory Celebration
+        setTimeout(() => {
+            btn.textContent = '✅ DONE';
+            btn.style.background = 'linear-gradient(45deg, #ff6b35, #f7931e)';
+            btn.style.boxShadow = '0 0 20px rgba(255, 107, 53, 0.8)';
+        }, 800);
+    });
+}
+
+// Copy all
+function copyAllLinks() {
+    const links = currentData.map(d => d.link).join('\n');
+    navigator.clipboard.writeText(links).then(() => {
+        showStatus(`Copied ${currentData.length} links`, 'success');
+    });
+}
+
+// Export CSV
+function exportToCSV() {
+    const csv = [
+        ['Receipt No.', 'Sales Type', 'Survey Model', 'Generated Link'].join(','),
+        ...currentData.map(d => [`"${d.receiptNo}"`, `"${d.salesType}"`, `"${d.surveyModel}"`, `"${d.link}"`].join(','))
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'survey_links.csv';
+    a.click();
+}
+
+// Clear data
+function clearData() {
+    currentData = [];
+    document.querySelector('#linkTable tbody').innerHTML = '';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('copyAllBtn').disabled = true;
+    document.getElementById('exportBtn').disabled = true;
+    clearStatus();
+}
+
+// Status
+function showStatus(msg, type) {
+    const statusDiv = document.getElementById('status');
+    statusDiv.textContent = msg;
+    statusDiv.className = `status ${type}`;
+    statusDiv.style.display = 'block';
+}
+function clearStatus() {
+    document.getElementById('status').style.display = 'none';
+}
+
+// Enable generate button
+document.getElementById('fileInput').addEventListener('change', e => {
+    document.getElementById('generateBtn').disabled = !e.target.files.length;
+});
+
+// Disable right click + all shortcuts
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey) e.preventDefault();
+    if (["F12", "F5", "I", "U", "S"].includes(e.key.toUpperCase()) && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+        e.preventDefault();
+    }
+});
+</script>
+</body>
+</html>
